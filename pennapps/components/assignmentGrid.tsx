@@ -54,7 +54,7 @@ export function AssignmentGrid() {
 
     if (isLoading) {
         return (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8 lg:gap-10 auto-rows-fr">
                 {Array.from({ length: 6 }).map((_, i) => (
                     <div key={i}>
                         <AssignmentCardSkeleton />
@@ -66,17 +66,20 @@ export function AssignmentGrid() {
 
     if (!isLoading && assignments.length === 0) {
         return (
-            <div className="flex flex-col justify-center items-center gap-4">
-                <div className="text-gray-500">No assignments found</div>
-                <Link href="/dashboard/assignments/new">
-                    <Button>Add A New Assignment</Button>
-                </Link>
+            <div className="mx-auto max-w-xl text-center rounded-2xl border border-neutral-200 bg-white/70 backdrop-blur p-10 shadow-sm">
+                <div className="text-neutral-600 text-base">No assignments yet</div>
+                <div className="mt-3 text-neutral-500 text-sm">Create your first assignment to start tracking.</div>
+                <div className="mt-6">
+                    <Link href="/dashboard/assignments/new">
+                        <Button className="rounded-full px-5 py-2.5">Add Assignment</Button>
+                    </Link>
+                </div>
             </div>
         )
     }
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 auto-rows-fr">
         {assignments.map((assignment, index) => (
         <div
           key={assignment.id}

@@ -288,7 +288,7 @@ export default function NewAssignmentPage() {
         <AnimatedOnLoad variant="fade-up" durationMs={500}>
           <div className="mt-8 flex items-center gap-3">
             <Button disabled={locked || !isValid() || processing} className="px-5" onClick={processAssignment}>
-              Create assignment
+              Add Assignment
             </Button>
             <Link href="/dashboard">
               <Button variant="ghost">Cancel</Button>

@@ -1,31 +1,24 @@
 "use client"
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-
 export function AssignmentCardSkeleton() {
   return (
-    <Card className="shadow-md bg-white/70 backdrop-blur ring-1 ring-gray-200">
-      <CardHeader className="pb-3">
-        <div className="h-5 w-3/4 bg-gray-200 rounded animate-pulse" />
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-3">
-          <div className="flex items-center justify-between text-sm">
-            <span className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
-            <span className="h-4 w-12 bg-gray-200 rounded animate-pulse" />
-          </div>
-          <div className="relative">
-            <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-              <div className="h-2 bg-gray-200 rounded-full animate-pulse w-1/2" />
+    <div className="rounded-2xl bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-md ring-1 ring-neutral-200/70 shadow-lg">
+      <div className="p-6">
+        <div className="flex flex-col items-center gap-5">
+          <div className="relative" style={{ width: 88, height: 88 }}>
+            <div className="absolute -inset-3 rounded-full blur-2xl opacity-40" style={{ background: "radial-gradient(60% 60% at 50% 50%, rgba(59,130,246,0.2), transparent 70%)" }} />
+            <div className="absolute inset-0 rounded-full border-8 border-neutral-200" />
+            <div className="absolute inset-0 rounded-full border-8 border-neutral-300 animate-pulse [clip-path:polygon(50%_0,100%_0,100%_100%,0_100%,0_0)]" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="h-4 w-10 bg-neutral-200 rounded animate-pulse" />
             </div>
           </div>
+          <div className="h-4 w-28 bg-neutral-200 rounded animate-pulse" />
+          <div className="h-6 w-3/4 bg-neutral-200 rounded animate-pulse" />
+          <div className="h-4 w-36 bg-neutral-200 rounded animate-pulse" />
         </div>
-        <div className="flex items-center justify-between">
-          <div className="h-4 w-28 bg-gray-200 rounded animate-pulse" />
-          <div className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
 

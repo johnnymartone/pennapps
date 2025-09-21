@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
-import { X } from "lucide-react"
+import { Loader2, X } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import Image from "next/image"
 import { Button } from "./ui/button"
@@ -26,6 +26,7 @@ interface CardModalProps {
 export function CardModal({ card, onClose, onCompleted, canComplete = true }: CardModalProps) {
   const [isMounted, setIsMounted] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
+  const [postLoading, setPostLoading] = useState(false)
 
   const startClose = () => {
     if (isClosing) return
@@ -46,6 +47,8 @@ export function CardModal({ card, onClose, onCompleted, canComplete = true }: Ca
   }, [startClose])
 
   const postComplete = async () => {
+    if (postLoading) return
+    setPostLoading(true)
     if (!canComplete) return
     const response = await fetch("/api/complete-task", {
       method: "POST",
@@ -55,6 +58,8 @@ export function CardModal({ card, onClose, onCompleted, canComplete = true }: Ca
       confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } })
       if (onCompleted) onCompleted(card.id)
       startClose()
+    } else {
+      setPostLoading(false)
     }
   }
 
@@ -118,8 +123,9 @@ export function CardModal({ card, onClose, onCompleted, canComplete = true }: Ca
               >
                 Close
               </Button>
-              <Button onClick={postComplete} disabled={!canComplete} className="px-4 py-2 text-sm font-medium bg-green-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-600 transition-colors">
+              <Button onClick={postComplete} disabled={!canComplete || postLoading} className="px-4 py-2 text-sm font-medium bg-green-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-600 transition-colors">
                 I Have Completed!
+                {postLoading && <Loader2 className="w-4 h-4 animate-spin" />}
               </Button>
             </div>
           </div>

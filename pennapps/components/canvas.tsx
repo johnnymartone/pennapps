@@ -111,7 +111,7 @@ export function MindMapCanvas({ tasks, focusIndex, total_completed }: { tasks: C
   useEffect(() => {
     setFocusedIndex(focusIndex)
     animatePanToCard(focusIndex)
-  }, [])
+  }, [cards])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -207,6 +207,9 @@ export function MindMapCanvas({ tasks, focusIndex, total_completed }: { tasks: C
       setTimeout(() => {
         confetti({ particleCount: 300, spread: 120, origin: { y: 0.8 } })
       }, 800)
+    } else {
+      setFocusedIndex(focusIndex + 1)
+      animatePanToCard(focusIndex + 1)
     }
   }, [cards])
 
@@ -273,7 +276,7 @@ export function MindMapCanvas({ tasks, focusIndex, total_completed }: { tasks: C
         </div>
       </div>
 
-      {selectedCard && <CardModal card={selectedCard} onClose={() => setSelectedCard(null)} onCompleted={handleCompleted} canComplete={selectedIndex === effectiveCompleted} />}
+      {selectedCard && <CardModal card={selectedCard} onClose={() => setSelectedCard(null)} onCompleted={handleCompleted} canComplete={selectedIndex === effectiveCompleted}/>}
 
       {showFinalCelebration && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-white text-black">

@@ -57,7 +57,8 @@ export default function Home() {
               </motion.div>
               <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.98 }}>
                 <Link
-                  href="/dashboard/test"
+                  href="https://youtu.be/UYBwPIIKS9c"
+                  target="_blank"
                   className="inline-flex items-center justify-center rounded-md px-5 py-3 text-sm font-medium text-gray-900 ring-2 ring-inset ring-gray-300 hover:bg-gray-200/40 hover:backdrop-blur-md transition-all duration-300"
                 >
                   View demo
