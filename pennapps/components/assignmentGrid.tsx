@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { Button } from "./ui/button";
+import { AssignmentCardSkeleton } from "@/components/assignment-card-skeleton";
 
 type Assignment = {
   id: number;
@@ -19,6 +20,7 @@ type Assignments = Assignment[]
 export function AssignmentGrid() {
     const [assignments, setAssignments] = useState<Assignments>([])
     const [isLoaded, setIsLoaded] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     useEffect(() => {
         const timer = setTimeout(() => setIsLoaded(true), 200)
         return () => clearTimeout(timer)
@@ -33,6 +35,7 @@ export function AssignmentGrid() {
                 .order("due_date", { ascending: true });
             if (error) {
                 console.error(error);
+                setIsLoading(false);
                 return;
             }
             const sorted = (data as Assignments).slice().sort((a, b) => {
@@ -44,11 +47,24 @@ export function AssignmentGrid() {
                 return bProgress - aProgress;
             });
             setAssignments(sorted);
+            setTimeout(() => setIsLoading(false), 500);
         };
     fetchAssignments();
     }, []);
 
-    if (isLoaded && assignments.length === 0) {
+    if (isLoading) {
+        return (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
+                {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i}>
+                        <AssignmentCardSkeleton />
+                    </div>
+                ))}
+            </div>
+        )
+    }
+
+    if (!isLoading && assignments.length === 0) {
         return (
             <div className="flex flex-col justify-center items-center gap-4">
                 <div className="text-gray-500">No assignments found</div>

@@ -37,7 +37,9 @@ export function LoginForm({
         email,
         password,
       });
+      console.log(error)
       if (error) throw error;
+
       router.push("/dashboard");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");

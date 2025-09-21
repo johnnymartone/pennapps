@@ -1,10 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import type React from "react"
 import { cn } from "@/lib/utils"
 
 type AnimatedOnLoadProps = {
-  as?: keyof JSX.IntrinsicElements
+  as?: React.ElementType
   className?: string
   children: React.ReactNode
   delay?: number
@@ -41,8 +42,7 @@ export default function AnimatedOnLoad({
       ? "opacity-100 scale-100"
       : "opacity-100 translate-y-0"
 
-  type ValidElementTag = keyof JSX.IntrinsicElements
-  const Comp = as as ValidElementTag
+  const Comp = as as React.ElementType
 
   return (
     <Comp

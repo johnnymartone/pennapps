@@ -68,11 +68,6 @@ export function MindMapCanvas({ tasks, focusIndex, total_completed }: { tasks: C
     }
   }, [tasks])
 
-  useEffect(() => {
-    setFocusedIndex(focusedIndex)
-    animatePanToCard(focusedIndex)
-  }, [cards])
-
   const animatePanToCard = useCallback(
     (cardIndex: number) => {
       if (!canvasRef.current || cardIndex >= cards.length) return
@@ -114,6 +109,11 @@ export function MindMapCanvas({ tasks, focusIndex, total_completed }: { tasks: C
   )
 
   useEffect(() => {
+    setFocusedIndex(focusIndex)
+    animatePanToCard(focusIndex)
+  }, [])
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowDown" && focusedIndex > 0) {
         const newIndex = focusedIndex - 1
@@ -131,7 +131,7 @@ export function MindMapCanvas({ tasks, focusIndex, total_completed }: { tasks: C
       canvas.addEventListener("keydown", handleKeyDown)
       return () => canvas.removeEventListener("keydown", handleKeyDown)
     }
-  }, [focusedIndex, cards.length, animatePanToCard])
+  }, [focusedIndex, animatePanToCard, cards.length])
 
   const handleCardClick = useCallback(
     (cardIndex: number) => {
@@ -208,7 +208,7 @@ export function MindMapCanvas({ tasks, focusIndex, total_completed }: { tasks: C
         confetti({ particleCount: 300, spread: 120, origin: { y: 0.8 } })
       }, 800)
     }
-  }, [cards, cards.length, total_completed])
+  }, [cards])
 
   const dayNumberFromYMD = (y: number, m: number, d: number) => Math.floor(Date.UTC(y, m - 1, d) / 86400000)
   const todayDayNumber = () => {

@@ -27,6 +27,12 @@ export function CardModal({ card, onClose, onCompleted, canComplete = true }: Ca
   const [isMounted, setIsMounted] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
 
+  const startClose = () => {
+    if (isClosing) return
+    setIsClosing(true)
+    setTimeout(() => onClose(), 250)
+  }
+
   useEffect(() => {
     const id = requestAnimationFrame(() => setIsMounted(true))
     const handleKey = (e: KeyboardEvent) => {
@@ -37,13 +43,7 @@ export function CardModal({ card, onClose, onCompleted, canComplete = true }: Ca
       cancelAnimationFrame(id)
       document.removeEventListener("keydown", handleKey)
     }
-  }, [])
-
-  const startClose = () => {
-    if (isClosing) return
-    setIsClosing(true)
-    setTimeout(() => onClose(), 250)
-  }
+  }, [startClose])
 
   const postComplete = async () => {
     if (!canComplete) return
