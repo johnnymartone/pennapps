@@ -25,9 +25,12 @@ type AssignmentRow = {
 }
 
 // Next may pass params synchronously or as a Promise in RSC context
-type PageParams = { id: string } | Promise<{ id: string }>
-export default async function AssignmentPage({ params }: { params: PageParams }) {
-    const { id } = await params;
+export default async function AssignmentPage({ params }: { params: Promise<Record<string, string>> | undefined }) {
+    const resolved = params ? await params : undefined;
+    const id = resolved?.id;
+    if (!id) {
+        return <div>Assignment not found</div>;
+    }
     const supabase = await createClient();
     const { data, error } = await supabase
         .from("assignments")
