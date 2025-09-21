@@ -58,10 +58,10 @@ export function SignUpForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
+      <Card className="bg-white/30 backdrop-blur-md supports-[backdrop-filter]:bg-white/20 ring-1 ring-white/50 border border-white/20 shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl">Sign up</CardTitle>
-          <CardDescription>Create a new account</CardDescription>
+          <CardDescription className="text-neutral-900">Create a new account</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignUp}>
@@ -75,6 +75,7 @@ export function SignUpForm({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  className="placeholder:text-neutral-900"
                 />
               </div>
               <div className="grid gap-2">

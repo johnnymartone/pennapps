@@ -4,10 +4,11 @@ import { useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { UploadCloud, ClipboardCheck, Calendar, FileText, X } from "lucide-react"
+import { UploadCloud, ClipboardCheck, Calendar, FileText } from "lucide-react"
 import Link from "next/link"
 import JSZip from "jszip"
 import { useRouter } from "next/navigation"
+import AnimatedOnLoad from "@/components/animated-onload"
 
 export default function NewAssignmentPage() {
   const [mode, setMode] = useState<"upload" | "paste">("upload")
@@ -46,7 +47,13 @@ export default function NewAssignmentPage() {
     const name = file.name.toLowerCase()
     if (name.endsWith(".pdf")) {
       const buf = await file.arrayBuffer()
-      const pdfjsLib: any = await import("pdfjs-dist")
+      type PdfTextContent = { items: Array<{ str?: string }> }
+      type PdfPage = { getTextContent: () => Promise<PdfTextContent> }
+      type PdfDocument = { numPages: number; getPage: (n: number) => Promise<PdfPage> }
+      const pdfjsLib = (await import("pdfjs-dist")) as unknown as {
+        GlobalWorkerOptions?: { workerSrc: string }
+        getDocument: (data: { data: ArrayBuffer }) => { promise: Promise<PdfDocument> }
+      }
       if (pdfjsLib.GlobalWorkerOptions) {
         pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs"
       }
@@ -56,7 +63,7 @@ export default function NewAssignmentPage() {
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i)
         const content = await page.getTextContent()
-        const strings = content.items.map((it: any) => (it.str ? it.str : ""))
+        const strings = (content.items as Array<{ str?: string }>).map((it) => (it.str ? it.str : ""))
         text += strings.join(" ") + "\n"
       }
       console.log(text.trim())
@@ -107,7 +114,7 @@ export default function NewAssignmentPage() {
       const info = data?.assignmentInfo
       if (info?.name) setAIName(info.name)
       if (info?.due_date) setDueDate(info.due_date)
-    } catch (e) {
+    } catch {
     } finally {
       setLabelLoading(false)
     }
@@ -126,7 +133,7 @@ export default function NewAssignmentPage() {
       const data = await res.json()
       console.log(data)
       await router.push(`/dashboard/assignments/${data.id}`)
-    } catch (e) {
+    } catch {
     } finally {
       setProcessing(false)
     }
@@ -151,18 +158,14 @@ export default function NewAssignmentPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-6 lg:px-8 py-10">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-gray-900">New assignment</h1>
-          <p className="mt-2 text-gray-700">Add your assignment details and set a due date.</p>
+      <AnimatedOnLoad variant="fade-up" durationMs={500}>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-gray-900">New assignment</h1>
+            <p className="mt-2 text-gray-700">Add your assignment details and set a due date.</p>
+          </div>
         </div>
-        <Link href="/dashboard" className="hidden sm:inline-flex">
-          <Button variant="outline" className="gap-2">
-            <X className="h-4 w-4" />
-            Cancel
-          </Button>
-        </Link>
-      </div>
+      </AnimatedOnLoad>
 
       <div className="mt-8">
         <div className="inline-flex items-center gap-1 rounded-lg bg-gray-100 p-1 ring-1 ring-gray-200">
@@ -188,68 +191,72 @@ export default function NewAssignmentPage() {
 
         {mode === "upload" ? (
           <div className="mt-6">
-            <div
-              className={`group relative flex h-56 w-full cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed bg-white/70 backdrop-blur transition ${
-                isDragging ? "border-gray-500" : "border-gray-300 hover:border-gray-400"
-              }`}
-              onDragOver={(e) => {
-                e.preventDefault()
-                setIsDragging(true)
-              }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={onDrop}
-              onClick={onBrowse}
-            >
-              <div className="text-center">
-                {droppedFile ? (
-                  <div className="flex flex-col items-center gap-2">
-                    <FileText className="h-8 w-8 text-gray-700" />
-                    <div className="text-sm font-medium text-gray-900">{droppedFile.name}</div>
-                    <div className="text-xs text-gray-500">Click to replace or drag another file</div>
-                    {extractedText && (
-                      <div className="text-xs text-gray-600">Extracted {extractedText.length} characters</div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center gap-3">
-                    <UploadCloud className="h-8 w-8 text-gray-700 transition-transform group-hover:scale-110" />
-                    <div className="text-sm font-medium text-gray-900">Drag and drop your assignment</div>
-                    <div className="text-xs text-gray-500">PDF, DOCX, or TXT. Click to browse</div>
-                  </div>
-                )}
+            <AnimatedOnLoad variant="fade-up" durationMs={500}>
+              <div
+                className={`group relative flex h-56 w-full cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed bg-white/70 backdrop-blur transition ${
+                  isDragging ? "border-gray-500" : "border-gray-300 hover:border-gray-400"
+                }`}
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  setIsDragging(true)
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={onDrop}
+                onClick={onBrowse}
+              >
+                <div className="text-center">
+                  {droppedFile ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <FileText className="h-8 w-8 text-gray-700" />
+                      <div className="text-sm font-medium text-gray-900">{droppedFile.name}</div>
+                      <div className="text-xs text-gray-500">Click to replace or drag another file</div>
+                      {extractedText && (
+                        <div className="text-xs text-gray-600">Extracted {extractedText.length} characters</div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-3">
+                      <UploadCloud className="h-8 w-8 text-gray-700 transition-transform group-hover:scale-110" />
+                      <div className="text-sm font-medium text-gray-900">Drag and drop your assignment</div>
+                      <div className="text-xs text-gray-500">PDF, DOCX, or TXT. Click to browse</div>
+                    </div>
+                  )}
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.docx,.txt"
+                  className="hidden"
+                  onChange={onFileChange}
+                />
               </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,.docx,.txt"
-                className="hidden"
-                onChange={onFileChange}
-              />
-            </div>
+            </AnimatedOnLoad>
           </div>
         ) : (
           <div className="mt-6">
-            <div className="rounded-2xl ring-1 ring-gray-200 bg-white/70 backdrop-blur p-4">
-              <div className="flex items-center gap-2 text-gray-700">
-                <ClipboardCheck className="h-4 w-4" />
-                <span className="text-sm font-medium">Paste your assignment text</span>
-              </div>
-              <textarea
-                value={pastedText}
-                onChange={(e) => setPastedText(e.target.value)}
-                placeholder="Paste the assignment prompt or instructions here"
-                rows={8}
-                className="mt-3 w-full resize-y rounded-lg border border-gray-200 bg-white p-3 text-sm outline-none ring-0 focus:border-gray-300"
-              />
-              <div className="mt-2 text-xs text-gray-500">{pastedText.trim().length} characters</div>
-              {!pasteReady && (
-                <div className="mt-3">
-                  <Button type="button" onClick={onPasteContinue} disabled={pastedText.trim().length === 0 || labelLoading}>
-                    Continue
-                  </Button>
+            <AnimatedOnLoad variant="fade-up" durationMs={500}>
+              <div className="rounded-2xl ring-1 ring-gray-200 bg-white/70 backdrop-blur p-4">
+                <div className="flex items-center gap-2 text-gray-700">
+                  <ClipboardCheck className="h-4 w-4" />
+                  <span className="text-sm font-medium">Paste your assignment text</span>
                 </div>
-              )}
-            </div>
+                <textarea
+                  value={pastedText}
+                  onChange={(e) => setPastedText(e.target.value)}
+                  placeholder="Paste the assignment prompt or instructions here"
+                  rows={8}
+                  className="mt-3 w-full resize-y rounded-lg border border-gray-200 bg-white p-3 text-sm outline-none ring-0 focus:border-gray-300"
+                />
+                <div className="mt-2 text-xs text-gray-500">{pastedText.trim().length} characters</div>
+                {!pasteReady && (
+                  <div className="mt-3">
+                    <Button type="button" onClick={onPasteContinue} disabled={pastedText.trim().length === 0 || labelLoading}>
+                      Continue
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </AnimatedOnLoad>
           </div>
         )}
 
@@ -260,30 +267,34 @@ export default function NewAssignmentPage() {
         )}
 
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="due_date">Due date</Label>
-            <div className="mt-2 relative">
-              <Input
-                id="due_date"
-                type="date"
-                value={dueDate}
-                onChange={(e) => {console.log(e.target.value); setDueDate(e.target.value)}}
-                className="w-full pr-10"
-                disabled={locked}
-              />
-              <Calendar className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+          <AnimatedOnLoad variant="fade-up" durationMs={500}>
+            <div>
+              <Label htmlFor="due_date">Due date</Label>
+              <div className="mt-2 relative">
+                <Input
+                  id="due_date"
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => {console.log(e.target.value); setDueDate(e.target.value)}}
+                  className="w-full pr-10"
+                  disabled={locked}
+                />
+                <Calendar className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+              </div>
             </div>
-          </div>
+          </AnimatedOnLoad>
         </div>
 
-        <div className="mt-8 flex items-center gap-3">
-          <Button disabled={locked || !isValid() || processing} className="px-5" onClick={processAssignment}>
-            Create assignment
-          </Button>
-          <Link href="/dashboard">
-            <Button variant="ghost">Cancel</Button>
-          </Link>
-        </div>
+        <AnimatedOnLoad variant="fade-up" durationMs={500}>
+          <div className="mt-8 flex items-center gap-3">
+            <Button disabled={locked || !isValid() || processing} className="px-5" onClick={processAssignment}>
+              Create assignment
+            </Button>
+            <Link href="/dashboard">
+              <Button variant="ghost">Cancel</Button>
+            </Link>
+          </div>
+        </AnimatedOnLoad>
       </div>
     </div>
   )

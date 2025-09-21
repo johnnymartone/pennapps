@@ -21,7 +21,10 @@ export type PlannedTask = {
   description: string;
   due_date: string;
   time_estimate: number;
+  searchQuery?: string | null;
+  scholarSearchQuery?: string | null;
   type: TaskType;
+  completed: boolean;
 };
 
 type AssignmentPlan = {
@@ -125,7 +128,8 @@ export async function build_task_list(
                   due_date: { type: "string", pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
                   time_estimate: { type: "number", minimum: 10, maximum: 60, multipleOf: 5 },
                   type: { type: "string", enum: ["research", "writing", "review", "revision", "submission", "learning", "practice", "planning", "organization", "citation", "sourcing", "annotation", "search"] },
-                  searchQuery: { type: "string", maxLength: 100, description: "The query to search for when the task is a search task." }
+                  searchQuery: { type: "string", maxLength: 100, description: "The query to search for when the task is a Google Search task." },
+                  scholarSearchQuery: { type: "string", maxLength: 100, description: "The query to search for when the task is a Google Scholar search task." }
                 },
                 required: ["id", "task", "description", "due_date", "time_estimate", "type"]
               }
@@ -158,7 +162,7 @@ export async function name_assignment(assignmentText: string | null) {
           type: "object",
           additionalProperties: false,
           properties: {
-            name: { type: "string", maxLength: 100 },
+            name: { type: "string", maxLength: 50 },
             due_date: { type: "string", pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", description: "The due date of the assignment in YYYY-MM-DD format." }
           },
           required: ["name"]

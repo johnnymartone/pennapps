@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Calendar, BookOpen } from "lucide-react"
+import { Calendar } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
@@ -20,12 +20,20 @@ interface AssignmentCardProps {
 export function AssignmentCard({ assignment }: AssignmentCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const router = useRouter()
-  const formatDueDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffTime = date.getTime() - now.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
+  const dayNumberFromYMD = (y: number, m: number, d: number) => Math.floor(Date.UTC(y, m - 1, d) / 86400000)
+  const parseYMD = (s: string) => {
+    const [y, m, d] = s.split("-").map(Number)
+    return { y, m, d }
+  }
+  const todayDayNumber = () => {
+    const now = new Date()
+    return dayNumberFromYMD(now.getFullYear(), now.getMonth() + 1, now.getDate())
+  }
+
+  const formatDueDate = (dateString: string) => {
+    const { y, m, d } = parseYMD(dateString.split("T")[0])
+    const diffDays = dayNumberFromYMD(y, m, d) - todayDayNumber()
     if (diffDays < 0) return "Overdue"
     if (diffDays === 0) return "Due today"
     if (diffDays === 1) return "Due tomorrow"
@@ -33,14 +41,16 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
   }
 
   const getProgressColor = (completed: number) => {
-    if (completed === 100) return "bg-green-500"
-    if (completed >= 75) return "bg-blue-500"
-    if (completed >= 50) return "bg-orange-500"
-    return "bg-gray-400"
+    if (completed >= 90) return "bg-green-500"
+    if (completed >= 75) return "bg-orange-300"
+    if (completed >= 50) return "bg-yellow-400"
+    return "bg-yellow-200"
   }
 
-  const isOverdue = new Date(assignment.due_date) < new Date()
-  const isDueToday = formatDueDate(assignment.due_date) === "Due today"
+  const { y, m, d } = ((s: string) => { const [yy, mm, dd] = s.split("-").map(Number); return { y: yy, m: mm, d: dd } })(assignment.due_date)
+  const diffDays = dayNumberFromYMD(y, m, d) - todayDayNumber()
+  const isOverdue = diffDays < 0
+  const isDueToday = diffDays === 0
 
   return (
     <Card
@@ -55,15 +65,11 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-medium text-gray-900 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
+          <h3 className={`font-medium text-gray-900 leading-tight line-clamp-2 group-hover:${getProgressColor(100 * (assignment.tasks_completed / assignment.total_tasks))} transition-colors duration-300`}>
             {assignment.name}
           </h3>
         </div>
 
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <BookOpen className="w-4 h-4" />
-          <span>Test</span>
-        </div>
       </CardHeader>
 
       <CardContent className="space-y-4">
@@ -77,7 +83,7 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
               <div
                 className={`h-2 rounded-full transition-all duration-1000 ease-out ${getProgressColor(100 * (assignment.tasks_completed / assignment.total_tasks))}`}
                 style={{
-                  width: isHovered ? `${100 * (assignment.tasks_completed / assignment.total_tasks)}%` : "0%",
+                  width: `${100 * (assignment.tasks_completed / assignment.total_tasks)}%`,
                   transitionDelay: isHovered ? "150ms" : "0ms",
                 }}
               />

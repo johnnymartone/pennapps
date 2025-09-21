@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import FooterController from "@/components/footer-controller";
+import AnimatedOnLoad from "@/components/animated-onload";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -10,8 +11,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Next.js and Supabase Starter Kit",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  title: "PlanIt - AI-powered assignment management",
+  description: "AI-powered assignment management that keeps you on schedule.",
 };
 
 const geistSans = Geist({
@@ -29,8 +30,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
         <Navbar />
-        {children}
-        <Footer />
+        <AnimatedOnLoad variant="fade-in" durationMs={500}>
+          {children}
+        </AnimatedOnLoad>
+        <FooterController />
       </body>
     </html>
   );

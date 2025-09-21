@@ -47,7 +47,7 @@ export function ForgotPasswordForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       {success ? (
-        <Card>
+        <Card className="bg-white/30 backdrop-blur-md supports-[backdrop-filter]:bg-white/20 ring-1 ring-white/50 border border-white/20 shadow-lg">
           <CardHeader>
             <CardTitle className="text-2xl">Check Your Email</CardTitle>
             <CardDescription>Password reset instructions sent</CardDescription>
@@ -60,7 +60,7 @@ export function ForgotPasswordForm({
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="bg-white/30 backdrop-blur-md supports-[backdrop-filter]:bg-white/20 ring-1 ring-white/50 border border-white/20 shadow-lg">
           <CardHeader>
             <CardTitle className="text-2xl">Reset Your Password</CardTitle>
             <CardDescription>

@@ -4,7 +4,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="min-h-screen flex flex-col">
+    <main className="min-h-[calc(100vh-4rem)] flex flex-col">
       {children}
     </main>
   );

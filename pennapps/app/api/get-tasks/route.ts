@@ -8,7 +8,7 @@ type Assignment = {
     user_id: string;
     id?: string;
     name: string;
-    due_date: any;
+    due_date: string;
     total_tasks?: number;
 }
 
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { assignment, due_date, assignmentName } = await request.json();
+    const { assignment, due_date, assignmentName } = (await request.json()) as { assignment: string; due_date: string; assignmentName: string };
     const [tasksPlan] = await Promise.all([
         build_task_list(assignment, due_date),
     ]);
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
         .from("assignments")
         .insert<Assignment>({
             user_id: user.id,
-            name: assignmentName.name,
+            name: assignmentName,
             due_date: due_date,
             total_tasks: totalTasks,
         })
@@ -47,6 +47,8 @@ export async function POST(request: NextRequest) {
         type: task.type,
         due_date: task.due_date,
         time_estimate: task.time_estimate,
+        query: task.searchQuery || null,
+        scholar_query: task.scholarSearchQuery || null,
     }));
 
     if (taskRows.length > 0) {

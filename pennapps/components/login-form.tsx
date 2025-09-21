@@ -38,7 +38,6 @@ export function LoginForm({
         password,
       });
       if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
       router.push("/dashboard");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
@@ -49,10 +48,10 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
+      <Card className="bg-white/30 backdrop-blur-md supports-[backdrop-filter]:bg-white/20 ring-1 ring-white/50 border border-white/20 shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
+          <CardDescription className="text-neutral-900">
             Enter your email below to login to your account
           </CardDescription>
         </CardHeader>
@@ -68,6 +67,7 @@ export function LoginForm({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  className="placeholder:text-neutral-900"
                 />
               </div>
               <div className="grid gap-2">

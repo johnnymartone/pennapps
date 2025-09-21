@@ -3,6 +3,8 @@
 import { AssignmentCard } from "@/components/assignmentCard"
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
+import { Button } from "./ui/button";
 
 type Assignment = {
   id: number;
@@ -25,15 +27,37 @@ export function AssignmentGrid() {
     useEffect(() => {
         const fetchAssignments = async () => {
             const supabase = await createClient();
-            const { data, error } = await supabase.from("assignments").select("*");
+            const { data, error } = await supabase
+                .from("assignments")
+                .select("*")
+                .order("due_date", { ascending: true });
             if (error) {
                 console.error(error);
                 return;
             }
-            setAssignments(data as Assignments);
+            const sorted = (data as Assignments).slice().sort((a, b) => {
+                const aDue = new Date(a.due_date).getTime();
+                const bDue = new Date(b.due_date).getTime();
+                if (aDue !== bDue) return aDue - bDue;
+                const aProgress = a.total_tasks ? a.tasks_completed / a.total_tasks : 0;
+                const bProgress = b.total_tasks ? b.tasks_completed / b.total_tasks : 0;
+                return bProgress - aProgress;
+            });
+            setAssignments(sorted);
         };
     fetchAssignments();
     }, []);
+
+    if (isLoaded && assignments.length === 0) {
+        return (
+            <div className="flex flex-col justify-center items-center gap-4">
+                <div className="text-gray-500">No assignments found</div>
+                <Link href="/dashboard/assignments/new">
+                    <Button>Add A New Assignment</Button>
+                </Link>
+            </div>
+        )
+    }
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
